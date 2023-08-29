@@ -1,0 +1,86 @@
+const ll x = 1e5+2;
+ll a[x], tree[4*x];
+
+
+void build(ll node, ll start, ll end){
+
+    if(start == end){
+        tree[node] = a[start];
+        return;
+    }
+
+    ll mid = (start+end)/2;
+    build(2*node, start, mid);
+    build(2*node+1, mid+1, end);
+
+    tree[node] = max(tree[2*node], tree[2*node+1]);
+
+}
+
+ll query(ll node, ll start, ll end, ll l, ll r){
+    if(start>r || end<l) return INT_MIN;
+    if(start>=l && end<=r) return tree[node];
+
+    ll mid = (start+end)/2;
+    
+    ll q1= query(2*node, start, mid, l, r);
+    ll q2= query(2*node+1, mid+1, end, l, r);
+
+    return max(q1, q2);
+}
+
+void update(ll node, ll start, ll end, ll ind, ll var){
+    if(start==end){
+        a[start]= var;
+        tree[node] = var;
+        return;
+    }
+
+    ll mid = (start+end)/2;
+
+    if(ind<= mid) update( 2*node,  start,  mid,  ind, var);
+    else update( 2*node+1, mid+1, end,  ind,  var);
+
+    tree[node] = max(tree[2*node], tree[2*node+1]);
+
+}
+
+int main()
+{
+    ios::sync_with_stdio(0);cin.tie(0);
+
+    in;
+    for (ll i = 0; i < n; i++)
+    {
+       cin>>a[i];
+
+    }
+    
+    build(1, 0, n-1);
+
+    while (1)
+    {
+        ll m; cin>>m;
+
+        if(m == -1) break;
+        if(m == 1){
+            ll l, r; cin>>l>>r;
+            ll ans = query(1, 0, n-1, l, r);
+            
+            cout<<ans<<endl;
+        }
+
+        else if(m == 2){
+            ll ind, var;
+            cin >> ind >>var;
+            update(1, 0, n-1, ind, var);
+
+            cout<<query(1, 0, n-1, 0, n-1)<<endl;
+        }
+    }
+    
+
+
+    
+    return 0;
+}
