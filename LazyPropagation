@@ -1,5 +1,5 @@
-const ll x = 1e5+2;
-ll a[x], tree[4*x], lazy[4*x];
+const ll MAXN = 1e5+2;
+ll a[MAXN], tree[4*MAXN], lazy[4*MAXN];
 
 void build(ll node, ll start, ll end){
     if(start == end){
@@ -11,101 +11,90 @@ void build(ll node, ll start, ll end){
     build(2*node, start, mid);
     build(2*node+1, mid+1, end);
 
-    tree[node] = max(tree[2*node], tree[2*node+1]);
+    tree[node] = (tree[2*node]+tree[2*node+1]);
 }
 
-void updateRange(ll node, ll start, ll end, ll l, ll r, ll val){
-    if(lazy[node] != 0){
-        tree[node] += lazy[node];
-
-        if(start != end){
-            lazy[2*node] += lazy[node];
-            lazy[2*node+1] += lazy[node];
-        }
-
-        lazy[node] = 0;
-    }
-
-    if(start > r || end < l)
-        return;
-
-    if(start >= l && end <= r){
-        tree[node] += val;
-
-        if(start != end){
-            lazy[2*node] += val;
-            lazy[2*node+1] += val;
-        }
-        return;
-    }
-
-    ll mid = (start+end)/2;
-    updateRange(2*node, start, mid, l, r, val);
-    updateRange(2*node+1, mid+1, end, l, r, val);
-
-    tree[node] = max(tree[2*node], tree[2*node+1]);
-}
-
-ll query(ll node, ll start, ll end, ll l, ll r){
-    if(lazy[node] != 0){
-        tree[node] += lazy[node];
-
-        if(start != end){
-            lazy[2*node] += lazy[node];
-            lazy[2*node+1] += lazy[node];
-        }
-
-        lazy[node] = 0;
-    }
-
-    if(start > r || end < l)
-        return INT_MIN;
-
-    if(start >= l && end <= r)
-        return tree[node];
-
-    ll mid = (start+end)/2;
-    
-    ll q1 = query(2*node, start, mid, l, r);
-    ll q2 = query(2*node+1, mid+1, end, l, r);
-
-    return max(q1, q2);
-}
-
-int main()
+void updateRange(ll node, ll start, ll end, ll l, ll r, ll val)
 {
-    ios::sync_with_stdio(0);cin.tie(0);
-
-    ll n;
-    cin >> n;
-    for (ll i = 0; i < n; i++)
-    {
-       cin >> a[i];
-    }
     
-    build(1, 0, n-1);
+    if (start > end or start > r or end < l)
+        return;
 
-    while (1)
+   
+    if (start == end)
     {
-        ll m; cin >> m;
-
-        if(m == -1) break;
-        if(m == 1){
-            ll l, r; cin >> l >> r;
-            ll ans = query(1, 0, n-1, l, r);
-            
-            cout << ans << endl;
-        }
-
-        else if(m == 2){
-            ll l, r, val;
-            cin >> l >> r >> val;
-            updateRange(1, 0, n-1, l, r, val);
-
-            cout << query(1, 0, n-1, 0, n-1) << endl;
-        }
+        tree[node] += val;
+        return;
     }
+
+   
+    int mid = (start + end) / 2;
+    updateRange(node*2, start, mid, l, r, val);
+    updateRange(node*2 + 1, mid + 1, end, l, r, val);
+    tree[node] = tree[node*2] + tree[node*2+1];
+}
+
+ll query(ll node, ll start, ll end, ll l, ll r)
+{
+    if(start > end or start > r or end < l)
+        return 0;         
+    if(lazy[node] != 0)
+    {
+        tree[node] += (end - start + 1) * lazy[node];          
+        if(start != end)
+        {
+            lazy[node*2] += lazy[node];         
+            lazy[node*2+1] += lazy[node];   
+        }
+        lazy[node] = 0;               
+    }
+    if(start >= l and end <= r)            
+        return tree[node];
+    int mid = (start + end) / 2;
+    int p1 = query(node*2, start, mid, l, r);        
+    int p2 = query(node*2 + 1, mid + 1, end, l, r); 
+    return (p1 + p2);
+}
+
+int main(){
+    ios_base::sync_with_stdio(false); 
+    cin.tie(NULL);
+
+    
+    t{
+
+        in;
+        ll q;
+        cin >> q;
+
+        for(ll i=0;i<n;i++)
+            a[i] = 0;
+
+        build(1, 0, n-1);
+
+        while(q--){
+            ll type;
+            cin >> type;
+
+            if(type == 0){
+                ll x, y, v;
+                cin >> x >> y >> v;
+
+                updateRange(1, 0, n-1, x, y, v);
+            }
+            else{
+                ll x, y;
+                cin >> x >> y;
+
+                cout << query(1, 0, n-1, x, y) << "\n";
+            }
+        }
+
+    }
+   
+  
 
     return 0;
 }
+
 
