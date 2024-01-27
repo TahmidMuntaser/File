@@ -1,0 +1,21 @@
+remove the common entities from two vectors
+vector<ll> inter;
+        set_intersection(a.begin(), a.end(),
+                        b.begin(), b.end(),
+                        back_inserter(inter));
+
+ O(min(n, m) * log(min(n, m)))
+       
+
+        a.erase(set_difference(a.begin(), a.end(),
+                                inter.begin(), inter.end(),
+                                a.begin()),
+                a.end());
+       
+
+        b.erase(set_difference(b.begin(), b.end(),
+                                inter.begin(), inter.end(),
+                                b.begin()),
+                b.end());
+        
+O(n)
